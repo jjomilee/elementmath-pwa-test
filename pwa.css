@@ -1,0 +1,8 @@
+.math-app-panel { box-sizing: border-box; max-width: 680px; margin: 24px auto; padding: 16px; border: 1px solid #e1d4bf; border-radius: 16px; background: #fffdf5; color: #263746; font: 15px/1.6 system-ui, sans-serif; text-align: left; overflow-wrap: anywhere; }
+.math-app-panel summary { cursor: pointer; font-weight: 700; min-height: 32px; }
+.math-app-panel p { margin: 8px 0; }
+.math-app-panel button { font: inherit; background: #25485c; color: white; padding: 10px 14px; border: 0; border-radius: 10px; min-height: 44px; margin: 8px 0; }
+.math-app-panel a { color: #185c86; }
+.math-app-panel .record { border-top: 1px solid #dedbd1; padding: 12px 0; }
+body { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+input[type=number] { font-size: max(16px, 1em); }

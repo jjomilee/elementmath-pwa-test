@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>곱셈 연습</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg1:#f7fbff; --bg2:#e9f4ff; --ink:#1f2937; --muted:#6b7280;
+      --brand:#2563eb; --brand-2:#1e40af; --ok:#059669; --bad:#dc2626; --panel:#fff;
+      --ring:#93c5fd; --border:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:24px 14px;font-family:ui-sans-serif,system-ui,apple-system,'Segoe UI',Roboto,'Noto Sans KR',sans-serif;color:var(--ink);
+      background:linear-gradient(180deg,var(--bg1),var(--bg2));}
+    h1{margin:0 0 8px;font-size:1.7rem}
+    .sub{color:var(--muted);margin-bottom:12px}
+
+    .wrap{max-width:980px;margin:0 auto;}
+
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:0 6px 20px #0001;padding:14px;margin:10px 0}
+
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-weight:700;font-size:.9rem}
+    select, input[type=number]{appearance:none;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:1rem;background:#fff}
+    select:focus, input[type=number]:focus{outline:3px solid var(--ring)}
+
+    .btn{border:0;border-radius:10px;padding:10px 14px;background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
+    .btn:hover{background:var(--brand-2)}
+    .btn.secondary{background:#eef2ff;color:#1e293b}
+    .btn:disabled{background:#cbd5e1;color:#475569;cursor:not-allowed}
+
+    .stats{display:flex;flex-wrap:wrap;gap:10px}
+    .pill{background:#f8fafc;border:1px solid var(--border);border-radius:999px;padding:8px 12px;font-weight:700}
+
+    .sheet{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px}
+    .row{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px dashed #eee}
+    .row:last-child{border-bottom:0}
+    .q{font-size:1.2rem}
+    .ans{width:120px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:10px;font-size:1rem;text-align:center}
+    .mark{width:42px;text-align:center;font-weight:900}
+    .ok{color:var(--ok)} .bad{color:var(--bad)}
+
+    #wrongList{margin-top:10px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px}
+    .wrong-item{font-size:.95rem;margin:4px 0}
+
+    .spacer{flex:1}
+  </style>
+
+  <meta name="theme-color" content="#ff6f61">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="쪼미 연산">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="pwa.css">
+  <script src="pwa.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <h1>✖️ 곱셈 연습</h1>
+    <div class="sub">두 피연산자의 자리수를 드롭다운으로 고르고, 원하는 문제 수를 입력하세요.</div>
+
+    <div class="card">
+      <div class="toolbar" role="form" aria-label="설정">
+        <div class="field">
+          <label for="digitsA">앞자리수</label>
+          <select id="digitsA" aria-label="앞자리수 선택">
+            <option value="1">1자리</option>
+            <option value="2">2자리</option>
+            <option value="3">3자리</option>
+            <option value="4">4자리</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="digitsB">뒤자리수</label>
+          <select id="digitsB" aria-label="뒤자리수 선택">
+            <option value="1">1자리</option>
+            <option value="2">2자리</option>
+            <option value="3">3자리</option>
+            <option value="4">4자리</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="problemCount">문제 수</label>
+          <input id="problemCount" type="number" min="1" max="100" value="10" inputmode="numeric" />
+        </div>
+        <span class="spacer"></span>
+        <button id="newSetBtn" class="btn">새 문제 만들기</button>
+        <button id="gradeBtn" class="btn secondary" disabled>채점하기</button>
+        <button id="resetBtn" class="btn secondary">초기화</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stats">
+        <div class="pill">문제 수: <strong id="count">0</strong></div>
+        <div class="pill">맞힌 개수: <strong id="correct">0</strong></div>
+        <div class="pill">틀린 개수: <strong id="wrong">0</strong></div>
+        <div class="pill">시간: <strong id="timer">00:00.0</strong></div>
+      </div>
+    </div>
+
+    <div id="sheet" class="sheet" aria-live="polite"></div>
+    <div id="result" style="margin-top:8px;font-weight:700"></div>
+
+    <div id="wrongList" hidden>
+      <h3 style="margin:0 0 6px">❌ 오답 목록</h3>
+      <div id="wrongItems"><p>아직 오답이 없습니다.</p></div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 상태 =====
+    let problems = [];
+    let started = false, graded = false;
+    let startTime = 0, timerId = null;
+    let correct = 0, wrong = 0;
+
+    // ===== 엘리먼트 =====
+    const digitsAEl = document.getElementById('digitsA');
+    const digitsBEl = document.getElementById('digitsB');
+    const problemCountEl = document.getElementById('problemCount');
+    const sheetEl = document.getElementById('sheet');
+    const gradeBtn = document.getElementById('gradeBtn');
+    const newSetBtn = document.getElementById('newSetBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const timerEl = document.getElementById('timer');
+    const resultEl = document.getElementById('result');
+    const wrongList = document.getElementById('wrongList');
+    const wrongItems = document.getElementById('wrongItems');
+
+    // ===== 유틸 =====
+    function fmt(ms){
+      const total = Math.floor(ms);
+      const m = Math.floor(total/60000);
+      const s = Math.floor((total%60000)/1000);
+      const d = Math.floor((total%1000)/100);
+      return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${d}`;
+    }
+    function startTimer(){
+      startTime = Date.now();
+      timerId = setInterval(()=>{ timerEl.textContent = fmt(Date.now() - startTime); }, 100);
+    }
+    function stopTimer(){ if(timerId){ clearInterval(timerId); timerId = null; } }
+
+    function randByDigits(d){
+      const di = Number(d);
+      const min = di === 1 ? 1 : Math.pow(10, di-1);
+      const max = Math.pow(10, di) - 1;
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    function makeProblem(){
+      const a = randByDigits(digitsAEl.value);
+      const b = randByDigits(digitsBEl.value);
+      return { a, b, op: '×', ans: a * b };
+    }
+    function uniqueKey(p){ return `${Math.min(p.a,p.b)}×${Math.max(p.a,p.b)}`; }
+
+    // ===== 렌더 =====
+    function rowEl(p, idx){
+      const row = document.createElement('div'); row.className = 'row';
+      const q = document.createElement('div'); q.className = 'q';
+      q.innerHTML = `${idx+1}. <strong>${p.a} ${p.op} ${p.b}</strong>`;
+      const eq = document.createElement('span'); eq.textContent = '=';
+      const input = document.createElement('input');
+      input.className = 'ans'; input.type = 'number'; input.inputMode = 'numeric';
+      input.autocomplete = 'off'; input.dataset.index = idx;
+      input.addEventListener('input', handleStart);
+      input.addEventListener('keydown', (e)=> handleEnterAdvance(e, idx));
+      const mark = document.createElement('div'); mark.className = 'mark'; mark.id = `mark-${idx}`;
+      row.appendChild(q); row.appendChild(eq); row.appendChild(input); row.appendChild(mark);
+      return row;
+    }
+    function renderSheet(){
+      sheetEl.innerHTML = '';
+      problems.forEach((p,i)=> sheetEl.appendChild(rowEl(p,i)));
+    }
+
+    // ===== 동작 =====
+    function handleStart(){ if(!started){ started = true; startTimer(); } }
+    function handleEnterAdvance(e, idx){
+      if(e.key === 'Enter'){
+        const inputs = sheetEl.querySelectorAll('input.ans');
+        if(idx < inputs.length - 1){ inputs[idx+1].focus(); }
+        else { grade(); }
+      }
+    }
+
+    function generateSet(){
+      let n = parseInt(problemCountEl.value, 10);
+      if(isNaN(n) || n < 1) n = 10; if(n > 100) n = 100;
+      const seen = new Set();
+      problems = [];
+      while(problems.length < n){
+        const p = makeProblem();
+        const k = uniqueKey(p);
+        if(!seen.has(k)) { seen.add(k); problems.push(p); }
+      }
+      correct = 0; wrong = 0; graded = false; started = false;
+      document.getElementById('count').textContent = problems.length;
+      document.getElementById('correct').textContent = correct;
+      document.getElementById('wrong').textContent = wrong;
+      timerEl.textContent = '00:00.0';
+      renderSheet();
+      resultEl.textContent = '';
+      wrongList.hidden = true; wrongItems.innerHTML = '<p>아직 오답이 없습니다.</p>';
+      gradeBtn.disabled = false;
+      const first = sheetEl.querySelector('input.ans'); if(first) first.focus();
+    }
+
+    function grade(){
+      if(graded) return;
+      const inputs = sheetEl.querySelectorAll('input.ans');
+      correct = 0; wrong = 0; const wrongListData = [];
+      inputs.forEach((inp,i)=>{
+        const val = inp.value.trim() === '' ? NaN : Number(inp.value); const p = problems[i];
+        const m = document.getElementById(`mark-${i}`);
+        if(Number.isNaN(val)){
+          m.textContent='⚠'; m.className='mark bad';
+          wrong++; wrongListData.push({ idx:i+1, text:`${p.a} ${p.op} ${p.b}`, user:'미입력', ans:p.ans });
+        } else if(val === p.ans){
+          m.textContent='✓'; m.className='mark ok'; correct++;
+        } else {
+          m.textContent='✗'; m.className='mark bad';
+          wrong++; wrongListData.push({ idx:i+1, text:`${p.a} ${p.op} ${p.b}`, user:val, ans:p.ans });
+        }
+        inp.disabled = true;
+      });
+      stopTimer();
+      const elapsed = started ? Date.now() - startTime : 0;
+      timerEl.textContent = fmt(elapsed); graded = true;
+      document.getElementById('correct').textContent = correct;
+      document.getElementById('wrong').textContent = wrong;
+      resultEl.textContent = `결과: ${problems.length}문제 중 ${correct}개 정답, ${wrong}개 오답 · 시간 ${fmt(elapsed)}`;
+      wrongList.hidden = wrongListData.length === 0;
+      wrongItems.innerHTML = wrongListData.length === 0 ? '<p>오답이 없어요 🎉</p>' : '';
+      wrongListData.forEach(item=>{
+        const div = document.createElement('div');
+        div.className='wrong-item';
+        div.textContent = `${item.idx}. ${item.text} → 내 답: ${item.user}, 정답: ${item.ans}`;
+        wrongItems.appendChild(div);
+      });
+      gradeBtn.disabled = true;
+      window.MathApp.saveTest({total: problems.length, correct, wrong,
+        elapsed: timerEl.textContent, mistakes: wrongListData});
+    }
+
+    function resetAll(){
+      stopTimer(); started=false; graded=false; problems=[];
+      sheetEl.innerHTML='';
+      document.getElementById('count').textContent='0';
+      document.getElementById('correct').textContent='0';
+      document.getElementById('wrong').textContent='0';
+      timerEl.textContent='00:00.0'; resultEl.textContent='';
+      wrongList.hidden=true; wrongItems.innerHTML='<p>아직 오답이 없습니다.</p>';
+      gradeBtn.disabled=true;
+    }
+
+    // 이벤트
+    newSetBtn.addEventListener('click', generateSet);
+    gradeBtn.addEventListener('click', grade);
+    resetBtn.addEventListener('click', resetAll);
+
+    // 초기
+    generateSet();
+  </script>
+</body>
+</html>

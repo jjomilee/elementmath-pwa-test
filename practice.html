@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>초등학생을 위한 간단한 연산 연습</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      background: linear-gradient(to bottom right, #FFEEAD, #FFB6B9);
+      text-align: center;
+      padding: 40px;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 2.4em;
+      color: #444;
+      margin-bottom: 40px;
+      text-shadow: 1px 1px 2px white;
+    }
+
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  max-width: 680px;   /* 선택: 두 개씩+여백 고려해 살짝 넉넉히 */
+  margin: 0 auto;
+}
+
+.menu a {
+  /* ★ 핵심: 버튼 내부 수평·수직 가운데 정렬 */
+  display: flex;                /* 내부를 flex 컨테이너로 */
+  align-items: center;          /* 수직 가운데 */
+  justify-content: center;      /* 수평 가운데 */
+  text-align: center;           /* 여러 줄 텍스트도 가운데 */
+
+  flex: 0 0 calc(50% - 10px);   /* 한 줄에 2개 고정(20px gap의 절반 보정) */
+  box-sizing: border-box;
+  min-height: 80px;             /* 세로 높이 확보 → 가운데 정렬 체감↑ */
+  padding: 20px;
+  font-size: 1.3em;
+  text-decoration: none;
+  color: white;
+  background-color: #ff6f61;
+  border-radius: 20px;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+
+    .menu a:hover {
+      background-color: #ff4f41;
+      transform: scale(1.05);
+    }
+
+    .emoji {
+      font-size: 1.6em;
+      margin-right: 10px;
+    }
+
+    footer {
+      margin-top: 50px;
+      font-size: 0.9em;
+      color: #555;
+    }
+
+    .back {
+      margin-top: 40px;
+      display: inline-block;
+      font-size: 1em;
+      color: #0077cc;
+      text-decoration: none;
+    }
+    
+  </style>
+
+  <meta name="theme-color" content="#ff6f61">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="쪼미 연산">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="pwa.css">
+  <script src="pwa.js"></script>
+</head>
+<body>
+
+  <h1>🎉 초등학생을 위한 간단한 연산 연습 🧮</h1>
+
+  <div class="menu">
+    <a href="0+-0.html"><span class="emoji"></span>한자리 덧셈뺄셈</a>
+    <a href="00+-00.html"><span class="emoji"></span>두자리 덧셈뺄셈</a>
+    <a href="000+-000.html"><span class="emoji"></span>세자리 덧셈뺄셈</a>
+    <a href="0+-0eq.html"><span class="emoji"></span>한자리덧셈뺄셈빈칸채우기</a>     
+    <a href="00+-00eq.html"><span class="emoji"></span>두자리덧셈뺄셈빈칸채우기</a>    
+    <a href="000+-000eq.html"><span class="emoji"></span>세자리덧셈뺄셈빈칸채우기</a>
+    <a href="0x0.html"><span class="emoji"></span>구구단</a>
+    <a href="00x0.html"><span class="emoji"></span>두자리X한자리 곱셈</a>
+    <a href="00x00.html"><span class="emoji"></span>두자리X두자리 곱셈</a>
+    <a href="000x000.html"><span class="emoji"></span>세자리X세자리 곱셈</a>
+    <a href="devide001.html"><span class="emoji"></span>나눗셈1</a>
+    <a href="devide002.html"><span class="emoji"></span>나눗셈2</a>
+    <a href="devide003.html"><span class="emoji"></span>나머지 있는 나눗셈1</a>
+    <a href="devide004.html"><span class="emoji"></span>나머지 있는 나눗셈2</a>
+
+
+
+
+    
+  </div>
+
+  <a href="index.html" class="back">🏠 메인으로 돌아가기</a>
+
+
+  
+  <footer>© 쪼미형제를 위한 연산 연습</footer>
+  <footer>E-mail : tanukilhj@naver.com</footer>
+
+</body>
+</html>

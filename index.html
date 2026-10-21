@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>초등학생을 위한 간단한 연산 연습</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    /* 기본 */
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Comic Sans MS", Arial, sans-serif;
+      background: linear-gradient(to bottom right, #FFEEAD, #FFB6B9);
+      color: #333;
+      margin: 0;
+      padding: 40px 16px 60px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: #444;
+      margin: 0 0 28px;
+      text-shadow: 1px 1px 2px #fff;
+    }
+
+    /* 메뉴 그리드 */
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      max-width: 680px;
+      margin: 0 auto 28px;
+      padding: 0;
+    }
+
+    .menu a {
+      /* 내부 가운데 정렬 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+
+      flex: 0 0 calc(50% - 10px); /* 2열 고정 (20px gap의 절반 보정) */
+      min-height: 88px;
+      padding: 18px;
+      border-radius: 20px;
+
+      text-decoration: none;
+      color: #fff;
+      background-color: #ff6f61;
+
+      font-size: 1.15rem;
+      font-weight: 700;
+
+      box-shadow: 2px 4px 8px rgba(0,0,0,.2);
+      transition: transform .2s, background-color .2s, box-shadow .2s;
+    }
+
+    .menu a:hover {
+      background-color: #ff4f41;
+      transform: scale(1.04);
+      box-shadow: 3px 6px 12px rgba(0,0,0,.22);
+    }
+
+    /* 작은 화면에서는 1열 */
+    @media (max-width: 520px) {
+      .menu a { flex: 1 1 100%; }
+    }
+
+    /* 푸터 */
+    footer {
+      margin-top: 24px;
+      color: #555;
+      font-size: .95rem;
+    }
+    footer a { color: inherit; }
+  </style>
+
+  <meta name="theme-color" content="#ff6f61">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="쪼미 연산">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="pwa.css">
+  <script src="pwa.js"></script>
+</head>
+<body>
+  <h1>초등학생을 위한 간단한 연산 연습</h1>
+
+  <nav class="menu" aria-label="연산 메뉴">
+    <!-- 필요한 항목만 남기고 텍스트 수정하세요 -->
+    <a href="practice.html">한문제씩 연습해보기</a>
+    <a href="test.html">시간 측정해보기</a>
+  </nav>
+
+  <!-- 본문 컨텐츠가 들어갈 자리 -->
+  <main id="content" aria-live="polite"></main>
+
+    <footer>쪼미형제를 위한 연산 연습</footer>
+
+  <footer>
+    E-mail: <a href="mailto:tanukilhj@naver.com">tanukilhj@naver.com</a>
+  </footer>
+</body>
+</html>

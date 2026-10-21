@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>두 자리 수 × 한 자리 수</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      background: linear-gradient(to bottom right, #ffe0f0, #c0e0ff);
+      text-align: center;
+      padding: 40px;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 30px;
+    }
+
+    .question {
+      font-size: 2.4em;
+      margin: 30px 0;
+      color: #222;
+    }
+
+    input {
+      font-size: 1.4em;
+      width: 120px;
+      text-align: center;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid #aaa;
+    }
+
+    button {
+      font-size: 1.2em;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 12px;
+      border: none;
+      background-color: #f39c12;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e67e22;
+    }
+
+    button:disabled {
+      background-color: #f6c288;
+      cursor: not-allowed;
+    }
+
+    #result {
+      font-size: 1.3em;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    #stats {
+      margin-top: 30px;
+      font-size: 1.1em;
+      background: #ffffffdd;
+      padding: 15px 25px;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 0 8px #ccc;
+    }
+
+    #wrongList {
+      margin-top: 30px;
+      text-align: left;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      background: #fff8e1;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 5px #ccc;
+    }
+
+    .wrong-item {
+      font-size: 1em;
+      margin: 5px 0;
+    }
+
+    .back {
+      margin-top: 40px;
+      display: inline-block;
+      font-size: 1em;
+      color: #0077cc;
+      text-decoration: none;
+    }
+  </style>
+
+  <meta name="theme-color" content="#ff6f61">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="쪼미 연산">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="pwa.css">
+  <script src="pwa.js"></script>
+</head>
+<body>
+
+  <h1>🍭 두 자리 수 × 한 자리 수</h1>
+
+  <div class="question" id="question">문제를 불러오는 중...</div>
+
+  <input type="number" id="answerInput" placeholder="정답 입력" inputmode="numeric" autocomplete="off">
+  <div>
+    <button id="submitBtn" onclick="checkAnswer()">제출</button>
+    <button id="nextBtn" onclick="nextQuestion()">다음 문제</button>
+  </div>
+
+  <div id="result"></div>
+
+  <div id="stats">
+    <p>총 문제 수: <span id="total">0</span></p>
+    <p>맞힌 문제 수: <span id="correct">0</span></p>
+    <p>틀린 문제 수: <span id="wrong">0</span></p>
+  </div>
+
+  <div id="wrongList">
+    <h3>❌ 오답 목록</h3>
+    <div id="wrongItems">
+      <p>아직 오답이 없습니다.</p>
+    </div>
+  </div>
+
+  <a href="index.html" class="back">🏠 메인으로 돌아가기</a>
+
+  <script>
+    let num1, num2, correctAnswer;
+    let total = 0, correct = 0, wrong = 0;
+    let wrongProblems = [];
+    let answered = false; // ⬅️ 현재 문제가 채점 완료되었는지 상태 플래그
+
+    function nextQuestion() {
+      num1 = Math.floor(Math.random() * 90) + 10;  // 10~99
+      num2 = Math.floor(Math.random() * 9) + 1;    // 1~9
+      correctAnswer = num1 * num2;
+      answered = false; // 새 문제 상태로 초기화
+
+      document.getElementById("question").innerText = `${num1} × ${num2} = ?`;
+      const input = document.getElementById("answerInput");
+      input.value = '';
+      input.focus(); // 새 문제에서 곧바로 입력 가능
+      document.getElementById("result").innerText = '';
+      const submitBtn = document.getElementById("submitBtn");
+      submitBtn.disabled = false;
+      submitBtn.textContent = '제출'; // 버튼 문구 복구
+    }
+
+    function updateStats() {
+      document.getElementById("total").innerText = total;
+      document.getElementById("correct").innerText = correct;
+      document.getElementById("wrong").innerText = wrong;
+    }
+
+    function updateWrongList() {
+      const container = document.getElementById("wrongItems");
+      if (wrongProblems.length === 0) {
+        container.innerHTML = "<p>아직 오답이 없습니다.</p>";
+        return;
+      }
+
+      container.innerHTML = "";
+      wrongProblems.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "wrong-item";
+        div.innerText = `${index + 1}. ${item.problem} → 내 답: ${item.user}, 정답: ${item.correct}`;
+        container.appendChild(div);
+      });
+    }
+
+    function checkAnswer() {
+      // 이미 채점이 끝났다면(=answered), 제출 대신 다음 문제로 넘어가지 않도록 가드
+      if (answered) return;
+
+      const inputEl = document.getElementById("answerInput");
+      const userInput = parseInt(inputEl.value, 10);
+      const submitBtn = document.getElementById("submitBtn");
+
+      if (isNaN(userInput)) {
+        document.getElementById("result").innerText = "⚠️ 숫자를 입력해주세요.";
+        inputEl.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      total++;
+
+      if (userInput === correctAnswer) {
+        correct++;
+        document.getElementById("result").innerText = "✅ 정답이에요! 잘했어요! (Enter를 누르면 다음 문제)";
+      } else {
+        wrong++;
+        wrongProblems.push({
+          problem: `${num1} × ${num2}`,
+          user: userInput,
+          correct: correctAnswer
+        });
+        document.getElementById("result").innerText = `❌ 오답이에요. 정답은 ${correctAnswer}입니다. (Enter를 누르면 다음 문제)`;
+      }
+
+      // 채점 완료 상태로 전환 → 다음 Enter는 nextQuestion으로
+      answered = true;
+      submitBtn.textContent = '채점 완료'; // 시각적 피드백
+      updateStats();
+      updateWrongList();
+    window.MathApp.savePractice({total, correct, wrong, wrongProblems});
+    }
+
+    // Enter 키 동작: 채점 전이면 checkAnswer(), 채점 후이면 nextQuestion()
+    const answerInput = document.getElementById("answerInput");
+    answerInput.addEventListener("keydown", function (e) {
+      if (e.isComposing) return; // IME 조합 중이면 무시
+      if (e.key === "Enter") {
+        if (answered) {
+          nextQuestion();
+        } else {
+          checkAnswer();
+        }
+      }
+    });
+
+    // 초기화
+    nextQuestion();
+    updateStats();
+    updateWrongList();
+    window.MathApp.savePractice({total, correct, wrong, wrongProblems});
+
+    const savedPractice = window.MathApp.loadPractice();
+    if (savedPractice) {
+      total = savedPractice.total; correct = savedPractice.correct;
+      wrong = savedPractice.wrong; wrongProblems = savedPractice.wrongProblems;
+      updateStats(); updateWrongList();
+    }
+</script>
+</body>
+</html>
